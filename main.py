@@ -1,6 +1,7 @@
 import os, csv
 from dotenv import load_dotenv
 from scrapper import StockChartsScrapper
+from selenium.webdriver.common.by import By
 
 load_dotenv()
 
@@ -37,7 +38,6 @@ def login(driver: StockChartsScrapper) -> None:
     driver.fill_input(xpath=xpaths["password"], value=credential["password"])
     driver.click_btn(xpath=xpaths["submit"])
 
-from selenium.webdriver.common.by import By
 
 def scrape_all_stocks(driver: StockChartsScrapper) -> None:
     all_upper_url = []
@@ -66,9 +66,11 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
 def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> None:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
-    if data == """{"error": "{} not found"}""".format(stock_name):
-        print("-> {} not found".format(stock_name))
+    
+    if data.startswith("{"):
+        print("{} not found".format(stock_name))
         return
+
     with open("./datas/{}.txt".format(stock_name), "w") as f:
         f.write(data)
     print("-> done getting {}".format(stock_name))
