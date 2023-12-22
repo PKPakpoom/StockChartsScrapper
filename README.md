@@ -5,7 +5,7 @@ this script get stock data and store in csv format file using Selenium with Chro
 
 First install all dependencies by this script:
 ```console
-$ python -m pip -r requirements.txt
+$ python -m pip install -r requirements.txt
 ```
 
 
