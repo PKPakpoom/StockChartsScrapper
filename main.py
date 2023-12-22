@@ -63,9 +63,12 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
             all_lower_url = []
     print("-> done getting stock names")
 
-def get_stock_data(driver: StockChartsScrapper, stock_name: str):
+def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> None:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
+    if data == """{"error": "{} not found"}""".format(stock_name):
+        print("-> {} not found".format(stock_name))
+        return
     with open("./datas/{}.txt".format(stock_name), "w") as f:
         f.write(data)
     print("-> done getting {}".format(stock_name))
