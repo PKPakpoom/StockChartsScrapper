@@ -63,17 +63,18 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
             all_lower_url = []
     print("-> done getting stock names")
 
-def get_stock_data(driver: StockChartsScrapper, stock_name: str):
+def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
     
     if data.startswith("{"):
         print("{} not found".format(stock_name))
-        return
+        return False
 
     with open("./datas/{}.txt".format(stock_name), "w") as f:
         f.write(data)
     print("-> done getting {}".format(stock_name))
+    return True
 
 
 def txt_to_csv(from_path: str, to_path: str) -> None:
@@ -100,7 +101,8 @@ def main():
         for stock_name in f.readlines():
             stock_name = stock_name.strip()
             print("-> getting data from {}".format(stock_name))
-            get_stock_data(driver=scrape, stock_name=stock_name)
+            if not get_stock_data(driver=scrape, stock_name=stock_name):
+                continue
             txt_to_csv(from_path="./datas/{}.txt".format(stock_name), to_path="./datas/{}.csv".format(stock_name))
             os.remove("./datas/{}.txt".format(stock_name))
 
