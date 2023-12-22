@@ -48,13 +48,13 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
 
     with open("./stocks.txt", "w") as f:
         for ua in all_upper_url:
-            print("-> getting stock names from {}".format(ua))
             driver.go_url(ua)
             for bb in driver.get_children_by_class_name(class_name["stock_names_lower_row"]):
                 all_lower_url.append(bb.get_attribute("href"))
             
             with open("./stocks.txt", "w") as f:
                 for ub in all_lower_url:
+                    print("-> getting stock names from {}".format(ub))
                     driver.go_url(ub)
                     table = driver.driver.find_element(By.XPATH, xpaths["stock_table_body"])
                     for row in table.find_elements(By.TAG_NAME, "tr"):
