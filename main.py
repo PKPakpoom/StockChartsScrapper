@@ -52,28 +52,28 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
             for bb in driver.get_children_by_class_name(class_name["stock_names_lower_row"]):
                 all_lower_url.append(bb.get_attribute("href"))
             
-            with open("./stocks.txt", "w") as f:
-                for ub in all_lower_url:
-                    print("-> getting stock names from {}".format(ub))
-                    driver.go_url(ub)
-                    table = driver.driver.find_element(By.XPATH, xpaths["stock_table_body"])
-                    for row in table.find_elements(By.TAG_NAME, "tr"):
-                        tds = row.find_elements(By.TAG_NAME, "td")
-                        f.write(tds[1].text + "\n")
+            for ub in all_lower_url:
+                print("-> getting stock names from {}".format(ub))
+                driver.go_url(ub)
+                table = driver.driver.find_element(By.XPATH, xpaths["stock_table_body"])
+                for row in table.find_elements(By.TAG_NAME, "tr"):
+                    tds = row.find_elements(By.TAG_NAME, "td")
+                    f.write(tds[1].text + "\n")
             all_lower_url = []
     print("-> done getting stock names")
 
-def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> None:
+def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
     
     if data.startswith("{"):
         print("{} not found".format(stock_name))
-        return
+        return False
 
     with open("./datas/{}.txt".format(stock_name), "w") as f:
         f.write(data)
     print("-> done getting {}".format(stock_name))
+    return True
 
 
 def txt_to_csv(from_path: str, to_path: str) -> None:
@@ -100,7 +100,8 @@ def main():
         for stock_name in f.readlines():
             stock_name = stock_name.strip()
             print("-> getting data from {}".format(stock_name))
-            get_stock_data(driver=scrape, stock_name=stock_name)
+            if not get_stock_data(driver=scrape, stock_name=stock_name):
+                continue
             txt_to_csv(from_path="./datas/{}.txt".format(stock_name), to_path="./datas/{}.csv".format(stock_name))
             os.remove("./datas/{}.txt".format(stock_name))
 
