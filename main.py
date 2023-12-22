@@ -66,7 +66,7 @@ def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
     
-    if data.startswith("{") or '/' in data:
+    if data.startswith("{") or ('/' in data) or data == "":
         print("{} not found".format(stock_name))
         return False
 
