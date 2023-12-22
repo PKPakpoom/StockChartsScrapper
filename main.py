@@ -63,6 +63,8 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
     print("-> done getting stock names")
 
 def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
+    if "/" in stock_name:
+        stock_name = stock_name.replace("/", "-")
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
     
