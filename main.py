@@ -60,7 +60,7 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
                     for row in table.find_elements(By.TAG_NAME, "tr"):
                         tds = row.find_elements(By.TAG_NAME, "td")
                         f.write(tds[1].text + "\n")
-        all_lower_url = []
+            all_lower_url = []
     print("-> done getting stock names")
 
 def get_stock_data(driver: StockChartsScrapper, stock_name: str):
