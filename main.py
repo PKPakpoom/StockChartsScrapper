@@ -58,7 +58,7 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
                 table = driver.driver.find_element(By.XPATH, xpaths["stock_table_body"])
                 for row in table.find_elements(By.TAG_NAME, "tr"):
                     tds = row.find_elements(By.TAG_NAME, "td")
-                    f.write(tds[1].text + "\n")
+                    f.write(tds[1].text.replace('/', '-') + "\n")
             all_lower_url = []
     print("-> done getting stock names")
 
@@ -66,9 +66,10 @@ def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
     driver.go_url(url=urls["get_stock_url"] + stock_name)
     data = driver.get_data(xpath=xpaths["stock_data_path"])
     
-    if data.startswith("{") or '/' in data:
+    if data.startswith("{") or data == "":
         print("{} not found".format(stock_name))
         return False
+
 
     with open("./datas/{}.txt".format(stock_name), "w") as f:
         f.write(data)
@@ -98,7 +99,7 @@ def main():
 
     with open("./stocks.txt", "r") as f:
         for stock_name in f.readlines():
-            stock_name = stock_name.strip()
+            stock_name = stock_name.strip().replace('/', '-')
             print("-> getting data from {}".format(stock_name))
             if not get_stock_data(driver=scrape, stock_name=stock_name):
                 continue
