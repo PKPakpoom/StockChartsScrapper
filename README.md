@@ -23,3 +23,4 @@ $ python main.py
 
 
 When everything is done you should get all stock data in ./datas
+but it takes a very long time make sure your screen won't goes black
