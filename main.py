@@ -2,6 +2,8 @@ import os, csv
 from dotenv import load_dotenv
 from scrapper import StockChartsScrapper
 from selenium.webdriver.common.by import By
+import csv
+import csv
 
 load_dotenv()
 
@@ -85,11 +87,14 @@ def txt_to_csv(from_path: str, to_path: str) -> None:
         next(txt_file)
         columns = txt_file.readline().split()
         next(txt_file)
-        with open(to_path, 'w') as csv_file:
+        with open(to_path, 'w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(columns)
-            while next(txt_file, "EOF") != "EOF":
-                csv_writer.writerow(txt_file.readline().split())
+            while True:
+                line = txt_file.readline().strip()
+                if not line:
+                    break
+                csv_writer.writerow(line.split())
 
 def main():
     scrape = StockChartsScrapper()
