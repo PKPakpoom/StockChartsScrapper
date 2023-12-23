@@ -53,14 +53,13 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
                 all_lower_url.append(bb.get_attribute("href"))
             
             for ub in all_lower_url:
-                print("-> getting stock names from {}".format(ub))
+                print("--> getting stock names from {}".format(ub))
                 driver.go_url(ub)
                 table = driver.driver.find_element(By.XPATH, xpaths["stock_table_body"])
                 for row in table.find_elements(By.TAG_NAME, "tr"):
                     tds = row.find_elements(By.TAG_NAME, "td")
                     f.write(tds[1].text.replace('/', '-') + "\n")
             all_lower_url = []
-    print("-> done getting stock names")
 
 def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
     try:
@@ -74,10 +73,10 @@ def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
 
         with open("./datas/{}.txt".format(stock_name), "w") as f:
             f.write(data)
-        print("-> done getting {}".format(stock_name))
+        print("--> done getting {}".format(stock_name))
         return True
     except:
-        print("{} not found".format(stock_name))
+        print("--> {} not found".format(stock_name))
         return False
 
 
@@ -95,10 +94,20 @@ def txt_to_csv(from_path: str, to_path: str) -> None:
 def main():
     scrape = StockChartsScrapper()
     login(driver=scrape)
-
+    
+    print("--> checking datas folder")
     if not os.path.exists("./datas"):
         os.makedirs("./datas")
 
+    print("--> checking stocks.txt")
+    if not os.path.exists("./stocks.txt"):
+        print("--> stocks.txt not found")
+        print("--> getting all stocks")
+        scrape_all_stocks(driver=scrape)
+        print("--> done getting all stocks")
+    
+
+    print("--> getting data from stocks.txt and start fetching")
     with open("./stocks.txt", "r") as f:
         for st in f.readlines():
             stock_name = st.strip()

@@ -3,5 +3,5 @@
 **/datas
 .env
 .gitignore
-.vscode
+**.vscode
 stocks.txt
