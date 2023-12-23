@@ -69,7 +69,7 @@ def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
         data = driver.get_data(xpath=xpaths["stock_data_path"])
         
         if data.startswith("{") or data == "":
-            print("{} not found".format(stock_name))
+            print("-> {} not found".format(stock_name))
             return False
 
 
@@ -100,11 +100,11 @@ def main():
     scrape = StockChartsScrapper()
     login(driver=scrape)
     
-    print("--> checking datas folder")
+    print("-> checking datas folder")
     if not os.path.exists("./datas"):
         os.makedirs("./datas")
 
-    print("--> checking stocks.txt")
+    print("-> checking stocks.txt")
     if not os.path.exists("./stocks.txt"):
         print("--> stocks.txt not found")
         print("--> getting all stocks")
@@ -116,6 +116,9 @@ def main():
     with open("./stocks.txt", "r") as f:
         for st in f.readlines():
             stock_name = st.strip()
+            if os.path.exists("./datas/{}.csv".format(stock_name)):
+                print("-> {} already exists".format(stock_name))
+                continue
             if not get_stock_data(driver=scrape, stock_name=stock_name):
                 continue
             print("-> getting data from {}".format(stock_name))
