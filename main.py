@@ -63,18 +63,22 @@ def scrape_all_stocks(driver: StockChartsScrapper) -> None:
     print("-> done getting stock names")
 
 def get_stock_data(driver: StockChartsScrapper, stock_name: str) -> bool:
-    driver.go_url(url=urls["get_stock_url"] + stock_name)
-    data = driver.get_data(xpath=xpaths["stock_data_path"])
-    
-    if data.startswith("{") or data == "":
+    try:
+        driver.go_url(url=urls["get_stock_url"] + stock_name)
+        data = driver.get_data(xpath=xpaths["stock_data_path"])
+        
+        if data.startswith("{") or data == "":
+            print("{} not found".format(stock_name))
+            return False
+
+
+        with open("./datas/{}.txt".format(stock_name), "w") as f:
+            f.write(data)
+        print("-> done getting {}".format(stock_name))
+        return True
+    except:
         print("{} not found".format(stock_name))
         return False
-
-
-    with open("./datas/{}.txt".format(stock_name), "w") as f:
-        f.write(data)
-    print("-> done getting {}".format(stock_name))
-    return True
 
 
 def txt_to_csv(from_path: str, to_path: str) -> None:
@@ -95,15 +99,14 @@ def main():
     if not os.path.exists("./datas"):
         os.makedirs("./datas")
 
-    scrape_all_stocks(scrape)
-
     with open("./stocks.txt", "r") as f:
-        for stock_name in f.readlines():
-            stock_name = stock_name.strip().replace('/', '-')
-            print("-> getting data from {}".format(stock_name))
+        for st in f.readlines():
+            stock_name = st.strip()
             if not get_stock_data(driver=scrape, stock_name=stock_name):
                 continue
+            print("-> getting data from {}".format(stock_name))
             txt_to_csv(from_path="./datas/{}.txt".format(stock_name), to_path="./datas/{}.csv".format(stock_name))
+            stock_name = stock_name.strip().replace('/', '-')
             os.remove("./datas/{}.txt".format(stock_name))
 
     scrape.close()
